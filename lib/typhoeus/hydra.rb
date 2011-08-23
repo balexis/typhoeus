@@ -125,6 +125,7 @@ module Typhoeus
         val = @cache_getter.call(request)
         if val
           @retrieved_from_cache[request.url] = val
+          queue_next
           handle_request(request, val, false)
         else
           @multi.add(get_easy_object(request))
@@ -165,9 +166,11 @@ module Typhoeus
       easy.request_body = request.body    if request.body
       easy.timeout      = request.timeout if request.timeout
       easy.connect_timeout = request.connect_timeout if request.connect_timeout
+      easy.interface       = request.interface if request.interface
       easy.follow_location = request.follow_location if request.follow_location
       easy.max_redirects = request.max_redirects if request.max_redirects
       easy.disable_ssl_peer_verification if request.disable_ssl_peer_verification
+      easy.disable_ssl_host_verification if request.disable_ssl_host_verification
       easy.ssl_cert         = request.ssl_cert
       easy.ssl_cert_type    = request.ssl_cert_type
       easy.ssl_key          = request.ssl_key
@@ -194,7 +197,7 @@ module Typhoeus
 
     def queue_next
       @running_requests -= 1
-      queue(@queued_requests.pop) unless @queued_requests.empty?
+      queue(@queued_requests.shift) unless @queued_requests.empty?
     end
     private :queue_next
 
