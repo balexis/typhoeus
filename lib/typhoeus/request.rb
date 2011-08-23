@@ -7,7 +7,7 @@ module Typhoeus
     attr_accessor :method, :params, :body, :connect_timeout, :timeout,
                   :user_agent, :response, :cache_timeout, :follow_location,
                   :max_redirects, :proxy, :proxy_username,:proxy_password,
-                  :disable_ssl_peer_verification,
+                  :disable_ssl_peer_verification, :disable_ssl_host_verification, :interface,
                   :ssl_cert, :ssl_cert_type, :ssl_key, :ssl_key_type,
                   :ssl_key_password, :ssl_cacert, :ssl_capath, :verbose,
                   :username, :password, :auth_method, :user_agent,
@@ -22,6 +22,7 @@ module Typhoeus
     # ** +:params+  : params as a Hash
     # ** +:body+
     # ** +:timeout+ : timeout (ms)
+    # ** +:interface+ : interface or ip address (string)
     # ** +:connect_timeout+ : connect timeout (ms)
     # ** +:headers+  : headers as Hash
     # ** +:user_agent+ : user agent (string)
@@ -30,6 +31,7 @@ module Typhoeus
     # ** +:max_redirects
     # ** +:proxy
     # ** +:disable_ssl_peer_verification
+    # ** +:disable_ssl_host_verification
     # ** +:ssl_cert
     # ** +:ssl_cert_type
     # ** +:ssl_key
@@ -48,6 +50,7 @@ module Typhoeus
       @body             = options[:body]
       @timeout          = options[:timeout]
       @connect_timeout  = options[:connect_timeout]
+      @interface        = options[:interface]
       @headers          = options[:headers] || {}
       @user_agent       = options[:user_agent] || Typhoeus::USER_AGENT
       @cache_timeout    = options[:cache_timeout]
@@ -59,6 +62,7 @@ module Typhoeus
       @proxy_password   = options[:proxy_password]
       @proxy_auth_method = options[:proxy_auth_method]
       @disable_ssl_peer_verification = options[:disable_ssl_peer_verification]
+      @disable_ssl_host_verification = options[:disable_ssl_host_verification]
       @ssl_cert         = options[:ssl_cert]
       @ssl_cert_type    = options[:ssl_cert_type]
       @ssl_key          = options[:ssl_key]

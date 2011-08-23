@@ -228,6 +228,14 @@ easy.timed_out?  # for a raw Easy handle
 response.timed_out?  # for a Response handle
 </pre>
 
+*Following Redirections*
+
+Use <code>:follow_location => true</code>,
+eg:
+<pre>
+Typhoeus::Request.new("www.example.com", :follow_location => true)
+</pre>
+
 *Basic Authentication*
 
 <pre>
@@ -246,6 +254,12 @@ Now, even if you have libcurl built with OpenSSL you may still have a messed up 
 
 <pre>
 Typhoeus::Request.get("https://mail.google.com/mail", :disable_ssl_peer_verification => true)
+</pre>
+
+If you are getting "SSL: certificate subject name does not match target host name" from curl (ex:- you are trying to access to b.c.host.com when the certificate subject is *.host.com). You can disable host verification. Like this:
+
+<pre>
+Typhoeus::Request.get("https://mail.google.com/mail", :disable_ssl_host_verification => true)
 </pre>
 
 *LibCurl*
@@ -352,12 +366,15 @@ We can see from this that NET::HTTP performs as expected, taking 10 seconds to r
 
 h2. Running the specs
 
-Running the specs requires a couple of Sinatra servers to be booted. Do this:
+Running the specs requires the native extensions to be built and a couple of Sinatra servers to be booted. Do this:
 
 <pre>
-  ruby spec/servers/app.rb -p 3000
-  ruby spec/servers/app.rb -p 3001
-  ruby spec/servers/app.rb -p 3002
+  # Make sure to build the native extensions
+  rake build_native
+  # Start up the test servers (in another terminal)
+  rake start_test_servers
+
+  # Run the specs
   rake spec
 </pre>
 

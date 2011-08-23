@@ -1,3 +1,17 @@
+Current master
+---------------------
+* Fix array params to be consistent with HTTP spec [gridaphobe]
+* traversal_to_params_hash should use the escape option [itsmeduncan]
+* Fix > 1024 open file descriptors [mschulkind]
+* Fixed a bug with internally queued requests being dropped [mschulkind]
+* Use gemspec in bundler to avoid duplication [mschulkind]
+* Run internally queued requests in FIFO order [mschulkind]
+* Moved Typhoeus::VERSION to a separate file, to fix rake build_native [mschulkind]
+* Fixed problems related to put requests with empty bodies [skaes, GH-84]
+* Added CURLOPT_INTERFACE option via Request#interface=. [spiegela]
+* Added Tempfile support to Form#process! [richievos]
+* Hydra won't forget to accept gzip/deflate encoding [codesnik]
+
 0.2.4
 -----
 * Fix form POSTs to only use multipart for file uploads, otherwise use application/x-www-form-urlencoded [dbalatero]

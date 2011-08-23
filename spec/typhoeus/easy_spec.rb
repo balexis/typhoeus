@@ -199,8 +199,7 @@ describe Typhoeus::Easy do
         :foo => 'bar',
         :username => ['dbalatero', 'dbalatero2']
       }
-      
-      easy.url.should =~ /\?.*username%5B%5D=dbalatero&username%5B%5D=dbalatero2/
+      easy.url.should =~ /\?.*foo=bar&username=dbalatero&username=dbalatero2/
     end
   end
 
@@ -224,6 +223,24 @@ describe Typhoeus::Easy do
       easy.response_code.should == 200
       easy.response_body.should include("this is a body!")
     end
+
+    it "should be able perform put with empty bodies on the same easy handle" do
+      easy = Typhoeus::Easy.new
+      easy.url    = "http://localhost:3002"
+      easy.method = :put
+      easy.perform
+      easy.response_code.should == 200
+      JSON.parse(easy.response_body)["REQUEST_METHOD"].should == "PUT"
+
+      easy.reset
+
+      easy.url    = "http://localhost:3002"
+      easy.method = :put
+      easy.perform
+      easy.response_code.should == 200
+      JSON.parse(easy.response_body)["REQUEST_METHOD"].should == "PUT"
+    end
+
   end
   
   describe "post" do
@@ -266,7 +283,7 @@ describe Typhoeus::Easy do
 
       request = JSON.parse(easy.response_body)
       request['CONTENT_TYPE'].should == 'application/x-www-form-urlencoded' 
-      request['rack.request.form_vars'].should == 'a=b&c=d&e%5Bf%5D%5Bg%5D=h'
+      request['rack.request.form_vars'].should == 'a=b&c=d&e[f][g]=h'
     end
 
     it "should handle a file upload, as multipart" do
@@ -314,6 +331,16 @@ describe Typhoeus::Easy do
     
     it "should send valid encoding headers and decode the response" do
       easy = Typhoeus::Easy.new
+      easy.url = "http://localhost:3002/gzipped"
+      easy.method = :get
+      easy.perform
+      easy.response_code.should == 200
+      JSON.parse(easy.response_body)["HTTP_ACCEPT_ENCODING"].should == "deflate, gzip"
+    end
+
+    it "should send valid encoding headers and decode the response after reset" do
+      easy = Typhoeus::Easy.new
+      easy.reset
       easy.url = "http://localhost:3002/gzipped"
       easy.method = :get
       easy.perform

@@ -20,6 +20,7 @@ module Typhoeus
       # [Only works on unix-style/SIGALRM operating systems. IOW, does
       # not work on Windows.
       :CURLOPT_CONNECTTIMEOUT_MS  => 156,
+      :CURLOPT_INTERFACE      => 10000 + 62,
       :CURLOPT_NOSIGNAL       => 99,
       :CURLOPT_HTTPHEADER     => 10023,
       :CURLOPT_FOLLOWLOCATION => 52,
@@ -32,6 +33,7 @@ module Typhoeus
       :CURLOPT_PROXYTYPE      => 101,
       :CURLOPT_PROXYAUTH      => 111,
       :CURLOPT_VERIFYPEER     => 64,
+      :CURLOPT_VERIFYHOST    => 81,
       :CURLOPT_NOBODY         => 44,
       :CURLOPT_ENCODING       => 10000 + 102,
       :CURLOPT_SSLCERT        => 10025,
@@ -76,12 +78,21 @@ module Typhoeus
       @method = :get
       @headers = {}
 
+      set_defaults
+    end
+
+    def set_defaults
       # Enable encoding/compression support
       set_option(OPTION_VALUES[:CURLOPT_ENCODING], '')
     end
 
     def headers=(hash)
       @headers = hash
+    end
+    
+    def interface=(interface)
+      @interface = interface
+      set_option(OPTION_VALUES[:CURLOPT_INTERFACE], interface)
     end
 
     def proxy=(proxy)
@@ -178,9 +189,7 @@ module Typhoeus
     def request_body=(request_body)
       @request_body = request_body
       if @method == :put
-        easy_set_request_body(@request_body)
-        headers["Transfer-Encoding"] = ""
-        headers["Expect"] = ""
+        easy_set_request_body(@request_body.to_s)
       else
         self.post_data = request_body
       end
@@ -199,6 +208,10 @@ module Typhoeus
       set_option(OPTION_VALUES[:CURLOPT_VERIFYPEER], 0)
     end
 
+    def disable_ssl_host_verification
+      set_option(OPTION_VALUES[:CURLOPT_VERIFYHOST], 0)
+    end
+
     def method=(method)
       @method = method
       if method == :get
@@ -208,7 +221,7 @@ module Typhoeus
         self.post_data = ""
       elsif method == :put
         set_option(OPTION_VALUES[:CURLOPT_UPLOAD], 1)
-        self.request_body = "" unless @request_body
+        self.request_body = @request_body.to_s
       elsif method == :head
         set_option(OPTION_VALUES[:CURLOPT_NOBODY], 1)
       else
@@ -349,7 +362,9 @@ module Typhoeus
       @response_code = 0
       @response_header = ""
       @response_body = ""
+      @request_body = ""
       easy_reset()
+      set_defaults
     end
 
     def get_info_string(option)
